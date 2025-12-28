@@ -60,7 +60,7 @@ export default function ResetPasswordForm() {
       toast.success(response.data.message);
       form.reset();
       dispatch(login(response.data.token));
-      router.push("/dashborad");
+      router.push("/dashboard");
     } else {
       toast.error(response.message);
     }

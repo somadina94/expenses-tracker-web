@@ -1,11 +1,18 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Menubar, MenubarMenu, MenubarTrigger } from "../ui/menubar";
 import Link from "next/link";
 import logo from "@/assets/Logo-web.jpg";
 import Image from "next/image";
 import { LightDarkToggle } from "../ui/light-dark-toggle";
+import { useAppSelector, AuthState, RootState } from "@/store";
 
 export default function DesktopMenu({ className }: { className?: string }) {
+  const { isLoggedIn } = useAppSelector(
+    (state: RootState) => state.auth
+  ) as AuthState;
+
   return (
     <nav
       className={cn(
@@ -37,9 +44,16 @@ export default function DesktopMenu({ className }: { className?: string }) {
           <MenubarTrigger asChild className="text-sm text-white">
             <Link href="#how-it-works">HOW IT WORKS</Link>
           </MenubarTrigger>
-          <MenubarTrigger asChild className="text-sm text-white">
-            <Link href="#sign-in">SIGN IN</Link>
-          </MenubarTrigger>
+          {!isLoggedIn && (
+            <MenubarTrigger asChild className="text-sm text-white">
+              <Link href="/sign-in">SIGN IN</Link>
+            </MenubarTrigger>
+          )}
+          {isLoggedIn && (
+            <MenubarTrigger asChild className="text-sm text-white">
+              <Link href="/dashboard">MY ACCOUNT</Link>
+            </MenubarTrigger>
+          )}
         </MenubarMenu>
       </Menubar>
     </nav>

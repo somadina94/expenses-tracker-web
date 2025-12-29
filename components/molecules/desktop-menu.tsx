@@ -1,7 +1,6 @@
 "use client";
-
 import { cn } from "@/lib/utils";
-import { Menubar, MenubarMenu, MenubarTrigger } from "../ui/menubar";
+import { Menubar, MenubarMenu } from "../ui/menubar";
 import Link from "next/link";
 import logo from "@/assets/Logo-web.jpg";
 import Image from "next/image";
@@ -22,37 +21,49 @@ export default function DesktopMenu({ className }: { className?: string }) {
     >
       <Menubar className="mx-auto max-w-400 w-full h-19 rounded-none border-0 flex items-center justify-between bg-primary p-2">
         <MenubarMenu>
-          <MenubarTrigger
-            asChild
+          <Link
+            href="/"
             className="text-[24px] font-bold md:text-2xl p-0 rounded-full"
           >
-            <Link href="/">
-              <div className="w-28 h-14 relative">
-                <Image
-                  src={logo}
-                  alt="logo"
-                  fill
-                  className="rounded-full border-4"
-                />
-              </div>
-            </Link>
-          </MenubarTrigger>
+            <div className="w-28 h-14 relative">
+              <Image
+                src={logo}
+                alt="logo"
+                fill
+                className="rounded-full border-4"
+              />
+            </div>
+          </Link>
           <LightDarkToggle />
-          <MenubarTrigger asChild className="text-sm text-white">
-            <Link href="#features">FEATURES</Link>
-          </MenubarTrigger>
-          <MenubarTrigger asChild className="text-sm text-white">
-            <Link href="#how-it-works">HOW IT WORKS</Link>
-          </MenubarTrigger>
+          <Link
+            href="#features"
+            className="text-sm text-white hover:opacity-50"
+          >
+            FEATURES
+          </Link>
+
+          <Link
+            href="#how-it-works"
+            className="text-sm text-white hover:opacity-50"
+          >
+            HOW IT WORKS
+          </Link>
+
           {!isLoggedIn && (
-            <MenubarTrigger asChild className="text-sm text-white">
-              <Link href="/sign-in">SIGN IN</Link>
-            </MenubarTrigger>
+            <Link
+              href="/sign-in"
+              className="text-sm text-white hover:opacity-50"
+            >
+              SIGN IN
+            </Link>
           )}
           {isLoggedIn && (
-            <MenubarTrigger asChild className="text-sm text-white">
-              <Link href="/dashboard">MY ACCOUNT</Link>
-            </MenubarTrigger>
+            <Link
+              href="/dashboard"
+              className="text-sm text-white hover:opacity-50"
+            >
+              MY ACCOUNT
+            </Link>
           )}
         </MenubarMenu>
       </Menubar>

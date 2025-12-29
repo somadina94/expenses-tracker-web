@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  planary:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+    container_name: williams-portfolio
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - planary-network
+
+networks:
+  planary-network:
+    driver: bridge

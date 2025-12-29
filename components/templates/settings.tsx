@@ -81,7 +81,7 @@ export default function Settings() {
           <Button
             onClick={() => router.push("/dashboard/update-account")}
             asChild
-            className="cursor-pointer"
+            className="cursor-pointer text-white"
           >
             <div className="flex flex-row items-center gap-4">
               <IoCreateOutline />
@@ -91,7 +91,7 @@ export default function Settings() {
           <Button
             onClick={() => router.push("/dashboard/update-password")}
             asChild
-            className="cursor-pointer"
+            className="cursor-pointer text-white"
           >
             <div className="flex flex-row items-center gap-4">
               <IoCreateOutline />

@@ -15,7 +15,7 @@ export default function SummaryItem({
       style={{ backgroundColor: color }}
     >
       <CardContent className="flex flex-col items-center gap-2 ">
-        <p className="text-md font-semibold text-gray-900">
+        <p className="text-md font-semibold text-gray-400">
           {title.toUpperCase()}
         </p>
         <p className="text-md text-gray-300">{value}</p>

@@ -1,5 +1,5 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSice';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import authReducer from "./authSice";
 import {
   persistStore,
   persistReducer,
@@ -9,13 +9,13 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const persistConfig = {
-  key: 'root',
-  storage: AsyncStorage,
+  key: "root",
+  storage: storage,
 };
 
 const rootReducer = combineReducers({

@@ -5,6 +5,7 @@ import SummaryItem from "../molecules/summary-item";
 import { useAppSelector, RootState, AuthState } from "@/store";
 import { Budget, Expense, Note } from "@/types";
 import { budgetService, expenseService, noteService } from "@/services";
+import Loading from "../atoms/loading";
 
 export default function Summaries() {
   const { user, access_token } = useAppSelector(
@@ -13,6 +14,7 @@ export default function Summaries() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (access_token) {
@@ -24,6 +26,7 @@ export default function Summaries() {
       });
       noteService.getNotes(access_token).then((res) => {
         setNotes(res.data.data.notes as Note[]);
+        setIsLoading(false);
       });
     }
   }, [access_token]);
@@ -66,8 +69,12 @@ export default function Summaries() {
   );
   const totalNotes = notes.length;
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col gap-6 p-4">
+    <div className="w-full max-w-200 mx-auto flex flex-col gap-6 p-4">
       <SummaryItem
         title="Current month budget"
         value={`${user?.currency} ${formatAmount(

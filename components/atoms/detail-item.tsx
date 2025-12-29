@@ -2,7 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 
 interface DetailItemProps {
   title: string;
-  content: string | false;
+  content: string | false | undefined;
   className?: string;
 }
 

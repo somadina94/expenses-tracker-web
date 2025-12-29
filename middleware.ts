@@ -1,0 +1,13 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export function middleware(req: NextRequest) {
+  const accessToken = req.cookies.get("access_token")?.value;
+
+  if (!accessToken) {
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+}
+
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};

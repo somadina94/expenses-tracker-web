@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +15,17 @@ import {
 } from "@/components/ui/sidebar";
 import {
   MENU_ITEMS,
+  MENU_ITEMS_NOTIFICATION,
   MENU_ITEMS_SINGLE,
   MENU_ITEMS_TOP,
 } from "@/constants/menu-items";
-import { useAppSelector, RootState, AuthState } from "@/store";
+import {
+  useAppSelector,
+  RootState,
+  AuthState,
+  logout,
+  useAppDispatch,
+} from "@/store";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LightDarkToggle } from "../ui/light-dark-toggle";
 import Link from "next/link";
@@ -27,25 +35,59 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
+import { notificationService } from "@/services";
+import { Notification } from "@/types";
+import { toast } from "sonner";
+import { IoPowerOutline } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 export function AppSidebar() {
-  const { user } = useAppSelector(
+  const { user, access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await notificationService.getNotifications(
+        access_token as string
+      );
+      if (res.status === 200) {
+        setNotifications(res.data.data.notifications);
+      } else {
+        toast(res.message);
+      }
+    };
+    fetchData();
+  }, [access_token]);
+
+  const unreadNotifications = notifications.filter(
+    (notification) => !notification.read
+  );
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex flex-row items-center gap-4 border-b">
-        <Avatar className="rounded-lg">
-          <AvatarImage
-            src="https://github.com/evilrabbit.png"
-            alt="@evilrabbit"
-          />
-          <AvatarFallback>{`${user?.name[0]}${
-            user?.name.split(" ")[1][0]
-          }`}</AvatarFallback>
-        </Avatar>
-        <span>Hi, {user?.name.split(" ")[0].toLocaleUpperCase()}</span>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <div className="flex flex-row items-center gap-3">
+                <Avatar className="rounded-lg">
+                  <AvatarImage
+                    src="https://github.com/evilrabbit.png"
+                    alt="@evilrabbit"
+                  />
+                  <AvatarFallback>{`${user?.name[0]}${
+                    user?.name.split(" ")[1][0]
+                  }`}</AvatarFallback>
+                </Avatar>
+                <span>Hi, {user?.name.split(" ")[0].toLocaleUpperCase()}</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="mb-4">
@@ -55,7 +97,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild>
                   <Link
                     href={MENU_ITEMS_TOP.url}
-                    className="flex flex-row items-center gap-2"
+                    className="flex flex-row items-center gap-3"
                   >
                     <MENU_ITEMS_TOP.icon />
                     <span>{MENU_ITEMS_TOP.title}</span>
@@ -79,7 +121,7 @@ export function AppSidebar() {
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton asChild>
                         <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <item.icon />
                             <span>{item.title}</span>
                           </div>
@@ -108,7 +150,7 @@ export function AppSidebar() {
                           <SidebarMenuSubItem key={menu.title}>
                             <Link
                               href={menu.url}
-                              className="flex items-center gap-2 w-full"
+                              className="flex items-center gap-3 w-full"
                             >
                               <menu.icon />
                               <span>{menu.title}</span>
@@ -127,15 +169,49 @@ export function AppSidebar() {
         <SidebarGroup className="mt-4">
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem
+                className="border-b cursor-pointer"
+                key={MENU_ITEMS_NOTIFICATION.title}
+              >
+                <SidebarMenuButton asChild>
+                  <Link
+                    href={MENU_ITEMS_NOTIFICATION.url}
+                    className="flex flex-row items-center justify-between"
+                  >
+                    <div className="flex flex-row items-center gap-3">
+                      <MENU_ITEMS_NOTIFICATION.icon />
+                      <span>{MENU_ITEMS_NOTIFICATION.title}</span>
+                    </div>
+                    {unreadNotifications.length > 0 && (
+                      <span className="text-destructive">
+                        {unreadNotifications.length}
+                      </span>
+                    )}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-4">
+          <SidebarGroupContent>
+            <SidebarMenu>
               {MENU_ITEMS_SINGLE.map((item) => (
-                <SidebarMenuItem className="border-b" key={item.title}>
+                <SidebarMenuItem
+                  className="border-b cursor-pointer"
+                  key={item.title}
+                >
                   <SidebarMenuButton asChild>
-                    <div className="flex flex-row items-center justify-between">
-                      <div className="flex flex-row items-center gap-2">
+                    <Link
+                      href={item.url}
+                      className="flex flex-row items-center justify-between"
+                    >
+                      <div className="flex flex-row items-center gap-3">
                         <item.icon />
                         <span>{item.title}</span>
                       </div>
-                    </div>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -144,7 +220,25 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <LightDarkToggle />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="w-full h-full px-0">
+              <div className="flex flex-row justify-between items-center gap-3 w-full">
+                <LightDarkToggle />
+                <button
+                  onClick={() => {
+                    router.push("/");
+                    dispatch(logout());
+                  }}
+                  className="flex flex-col items-center cursor-pointer"
+                >
+                  <IoPowerOutline />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

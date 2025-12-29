@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "@/types";
+import Cookies from "js-cookie";
 
 export interface AuthState {
   user: User | null;
@@ -20,6 +21,10 @@ const authSlice = createSlice({
     login: (state, action) => {
       state.isLoggedIn = true;
       state.access_token = action.payload;
+      Cookies.set("access_token", action.payload, {
+        secure: true,
+        sameSite: "lax",
+      });
     },
     setUser: (state, action) => {
       state.user = action.payload;
@@ -28,6 +33,7 @@ const authSlice = createSlice({
       state.user = null;
       state.isLoggedIn = false;
       state.access_token = null;
+      Cookies.remove("access_token");
     },
   },
 });

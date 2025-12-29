@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +7,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -23,50 +22,59 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
 import { authService } from "@/services";
-import { useAppDispatch, login, setUser } from "@/store";
-import Link from "next/link";
+import { useAppSelector, RootState, AuthState } from "@/store";
 import { useRouter } from "next/navigation";
+import Loading from "../atoms/loading";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+const passwordSchema = z.object({
+  passwordCurrent: z.string().min(6, "Password must be at least 6 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  passwordConfirm: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const formSchema = loginSchema;
+const formSchema = passwordSchema;
 
-export default function LoginForm() {
-  const dispatch = useAppDispatch();
+export default function UpdatePasswordForm() {
+  const { access_token } = useAppSelector(
+    (state: RootState) => state.auth
+  ) as AuthState;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
+
+  const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      passwordCurrent: "",
       password: "",
+      passwordConfirm: "",
     },
   });
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    const response = await authService.login({
-      email: data.email,
-      password: data.password,
-    });
+    setIsLoading(true);
+    const response = await authService.updatePassword(
+      access_token as string,
+      data
+    );
 
     if (response.status === 200) {
       toast.success(response.data.message);
-      form.reset();
-      dispatch(setUser(response.data.data.user));
-      dispatch(login(response.data.token));
-      router.push("/dashboard");
+      router.back();
     } else {
-      console.log(response);
       toast.error(response.message);
     }
+    setIsLoading(false);
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>Login and explore</CardDescription>
+        <CardTitle>Update</CardTitle>
+        <CardDescription>Update your password</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -76,12 +84,12 @@ export default function LoginForm() {
           >
             <FormField
               control={form.control}
-              name="email"
+              name="passwordCurrent"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Current password</FormLabel>
                   <FormControl>
-                    <Input placeholder="john@example.com" {...field} />
+                    <Input {...field} type="password" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,33 +100,31 @@ export default function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>New password</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="***************"
-                      type="password"
-                      {...field}
-                    />
+                    <Input {...field} type="password" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Link href="/forgot-password" className="text-primary">
-              Forgot Password?
-            </Link>
-            <Button type="submit">LOGIN</Button>
+            <FormField
+              control={form.control}
+              name="passwordConfirm"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm new password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">UPADTE</Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter>
-        <p>
-          Don&apos;t have an account?{" "}
-          <Link href="sign-up" className="text-primary">
-            Sign up
-          </Link>
-        </p>
-      </CardFooter>
     </Card>
   );
 }

@@ -86,13 +86,14 @@ export const MENU_ITEMS_TOP = {
 
 export const MENU_ITEMS_SINGLE = [
   {
-    title: "Notifications",
-    url: "/dashboard/notifications",
-    icon: CiBellOn,
-  },
-  {
     title: "Settings",
     url: "/dashboard/settings",
     icon: IoSettingsOutline,
   },
 ];
+
+export const MENU_ITEMS_NOTIFICATION = {
+  title: "Notifications",
+  url: "/dashboard/all-notification",
+  icon: CiBellOn,
+};

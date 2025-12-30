@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -27,14 +26,14 @@ import { Note } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "../atoms/loading";
 import { Textarea } from "../ui/textarea";
+import IconButton from "../atoms/IconButton";
+import { Edit } from "lucide-react";
 
-const noteSchema = z.object({
+const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  content: z.string({ error: "Content is required" }),
+  content: z.string().min(1, "Title is required"),
   reminder: z.string().optional(),
 });
-
-const formSchema = noteSchema;
 
 export default function UpdateNoteForm() {
   const { access_token } = useAppSelector(
@@ -47,6 +46,7 @@ export default function UpdateNoteForm() {
 
   const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       title: "",
       content: "",
@@ -110,6 +110,10 @@ export default function UpdateNoteForm() {
     return <Loading />;
   }
 
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
@@ -118,54 +122,59 @@ export default function UpdateNoteForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="reminder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reminder</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">UPADTE</Button>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="reminder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reminder</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <IconButton
+                Icon={Edit}
+                title="UPADTE"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

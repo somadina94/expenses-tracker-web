@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import IconButton from "../atoms/IconButton";
 import {
   Card,
   CardHeader,
@@ -38,19 +38,19 @@ import {
   RootState,
   AuthState,
 } from "@/store";
+import { useRouter } from "next/navigation";
 
 import { fetchCountries } from "@/utils/fetch-countries-currencies";
 import { User } from "@/types";
+import { Edit } from "lucide-react";
 
-const loginSchema = z.object({
+const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   country: z.string().min(1, "Country is required"),
   currency: z.string().min(1, "Currency is required"),
 });
-
-const formSchema = loginSchema;
 
 export default function UpdateAccountForm() {
   const { access_token, user } = useAppSelector(
@@ -64,6 +64,7 @@ export default function UpdateAccountForm() {
   >([]);
 
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,11 +108,10 @@ export default function UpdateAccountForm() {
       parsedData
     );
 
-    console.log(parsedData);
-
     if (response.status === 200) {
       toast.success(response.data.message);
       dispatch(setUser(response.data.data.user));
+      router.back();
     } else {
       toast.error(response.message);
     }
@@ -133,6 +133,10 @@ export default function UpdateAccountForm() {
     (item) => typeof item.label === "string"
   );
 
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
@@ -141,126 +145,134 @@ export default function UpdateAccountForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="john@example.com"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Select
-                      key={field.value}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a country" />
-                      </SelectTrigger>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="john@example.com"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Select
+                        key={field.value}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a country" />
+                        </SelectTrigger>
 
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Country</SelectLabel>
-                          {[...countries]
-                            .sort((a, b) => a.label.localeCompare(b.label))
-                            .map((el) => (
-                              <SelectItem key={el.label} value={el.label}>
-                                {el.label}
-                              </SelectItem>
-                            ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Country</SelectLabel>
+                            {[...countries]
+                              .sort((a, b) => a.label.localeCompare(b.label))
+                              .map((el) => (
+                                <SelectItem key={el.label} value={el.label}>
+                                  {el.label}
+                                </SelectItem>
+                              ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="currency"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Currency</FormLabel>
-                  <FormControl>
-                    <Select
-                      key={field.value}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a currency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Currency</SelectLabel>
-                          {Array.from(
-                            new Map(
-                              cleanCurrencies.map((item) => [item.label, item])
-                            ).values()
-                          )
-                            .sort((a, b) => a.label.localeCompare(b.label))
-                            .map((el) => (
-                              <SelectItem key={el.label} value={el.label}>
-                                {el.label}
-                              </SelectItem>
-                            ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">UPDATE</Button>
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <FormControl>
+                      <Select
+                        key={field.value}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Currency</SelectLabel>
+                            {Array.from(
+                              new Map(
+                                cleanCurrencies.map((item) => [
+                                  item.label,
+                                  item,
+                                ])
+                              ).values()
+                            )
+                              .sort((a, b) => a.label.localeCompare(b.label))
+                              .map((el) => (
+                                <SelectItem key={el.label} value={el.label}>
+                                  {el.label}
+                                </SelectItem>
+                              ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <IconButton
+                Icon={Edit}
+                title="UPADTE"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

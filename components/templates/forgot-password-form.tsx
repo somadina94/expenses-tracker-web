@@ -1,6 +1,4 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -23,16 +21,17 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { authService } from "@/services";
 import { useRouter } from "next/navigation";
+import IconButton from "../atoms/IconButton";
+import { Mail } from "lucide-react";
 
-const loginSchema = z.object({
+const formSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
-
-const formSchema = loginSchema;
 
 export default function ForgotPasswordForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       email: "",
     },
@@ -50,6 +49,11 @@ export default function ForgotPasswordForm() {
       toast.error(response.message);
     }
   };
+
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
@@ -61,24 +65,29 @@ export default function ForgotPasswordForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">PROCEED</Button>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="john@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <IconButton
+                Icon={Mail}
+                title="PROCEED"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

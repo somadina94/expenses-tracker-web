@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -26,19 +25,20 @@ import { authService } from "@/services";
 import { useAppDispatch, login, setUser } from "@/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { LogIn } from "lucide-react";
+import IconButton from "../atoms/IconButton";
 
-const loginSchema = z.object({
+const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
-
-const formSchema = loginSchema;
 
 export default function LoginForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       email: "",
       password: "",
@@ -58,10 +58,14 @@ export default function LoginForm() {
       dispatch(login(response.data.token));
       router.push("/dashboard");
     } else {
-      console.log(response);
       toast.error(response.message);
     }
   };
+
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
@@ -70,44 +74,49 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="john@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="***************"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Link href="/forgot-password" className="text-primary">
-              Forgot Password?
-            </Link>
-            <Button type="submit">LOGIN</Button>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="john@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="***************"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Link href="/forgot-password" className="text-primary">
+                Forgot Password?
+              </Link>
+              <IconButton
+                Icon={LogIn}
+                title="LOGIN"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

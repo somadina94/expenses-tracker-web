@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import IconButton from "../atoms/IconButton";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
@@ -21,17 +21,12 @@ import Loading from "../atoms/loading";
 import { Expense } from "@/types";
 import ExpenseItem from "../molecules/expense-item";
 import NoResult from "../atoms/no-result";
+import { Search } from "lucide-react";
 
-const searchExpenseSchema = z.object({
-  startDate: z.date({
-    error: "Start date is required",
-  }),
-  endDate: z.date({
-    error: "End date is required",
-  }),
+const formSchema = z.object({
+  startDate: z.date().min(1, "Start date is required"),
+  endDate: z.date().min(1, "End date is required"),
 });
-
-const formSchema = searchExpenseSchema;
 
 export default function SearchExpenseForm() {
   const { access_token } = useAppSelector(
@@ -42,9 +37,10 @@ export default function SearchExpenseForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
-      startDate: undefined,
-      endDate: undefined,
+      startDate: new Date(),
+      endDate: new Date(),
     },
   });
 
@@ -68,70 +64,82 @@ export default function SearchExpenseForm() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <div className="max-w-200 mx-auto w-full p-2">
       <Card className="w-full mb-12 mx-auto">
         <CardContent>
           <Form {...form}>
-            <form
-              className="flex flex-col md:flex-row justify-between md:items-center gap-4"
-              onSubmit={form.handleSubmit(handleSubmit)}
-            >
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start date</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        value={
-                          field.value
-                            ? field.value.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value
-                              ? new Date(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start date</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        value={
-                          field.value
-                            ? field.value.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value
-                              ? new Date(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">SEARCH</Button>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <fieldset
+                disabled={isSubmitting}
+                className="flex flex-col md:flex-row justify-between md:items-center gap-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value
+                              ? field.value.toISOString().split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? new Date(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Start date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value
+                              ? field.value.toISOString().split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? new Date(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Search}
+                  title="SEARCH"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
             </form>
           </Form>
         </CardContent>

@@ -14,7 +14,6 @@ import { User } from "@/types";
 import { toast } from "sonner";
 import Loading from "../atoms/loading";
 import InfoItem from "../atoms/info-item";
-import { IoCreateOutline, IoTrashOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
@@ -27,12 +26,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import IconButton from "../atoms/IconButton";
+import { Edit, Trash } from "lucide-react";
 
 export default function Settings() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [user, setUser] = useState<User>();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -51,6 +53,7 @@ export default function Settings() {
   }, [access_token]);
 
   async function deleteHandler() {
+    setIsDeleting(true);
     const res = await authService.deleteMe(access_token as string);
     if (res.status === 200) {
       toast.success(res.data.message);
@@ -59,6 +62,7 @@ export default function Settings() {
     } else {
       toast.error(res.message);
     }
+    setIsDeleting(false);
   }
 
   if (isLoading) {
@@ -78,35 +82,30 @@ export default function Settings() {
       </Card>
       <Card className="w-full mb-12">
         <CardContent className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <Button
+          <IconButton
             onClick={() => router.push("/dashboard/update-account")}
-            asChild
-            className="cursor-pointer text-white"
-          >
-            <div className="flex flex-row items-center gap-4">
-              <IoCreateOutline />
-              <span>Update account</span>
-            </div>
-          </Button>
-          <Button
+            Icon={Edit}
+            title="Update profile"
+            type="submit"
+            // disabled={!isValid || isSubmitting}
+            // isLoading={isSubmitting}
+          />
+          <IconButton
             onClick={() => router.push("/dashboard/update-password")}
-            asChild
-            className="cursor-pointer text-white"
-          >
-            <div className="flex flex-row items-center gap-4">
-              <IoCreateOutline />
-              <span>Update Password</span>
-            </div>
-          </Button>
+            Icon={Edit}
+            title="Update password"
+            type="submit"
+          />
 
           <AlertDialog>
             <AlertDialogTrigger asChild className="cursor-pointer">
-              <Button asChild className="cursor-pointer" variant="destructive">
-                <div className="flex flex-row items-center gap-4">
-                  <IoTrashOutline />
-                  <span>Delete account</span>
-                </div>
-              </Button>
+              <IconButton
+                variant="destructive"
+                Icon={Trash}
+                title="Delete profile"
+                type="button"
+                isLoading={isDeleting}
+              />
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>

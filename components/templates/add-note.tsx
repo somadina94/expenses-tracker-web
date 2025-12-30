@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import IconButton from "../atoms/IconButton";
 import {
   Card,
   CardHeader,
@@ -24,26 +23,25 @@ import { toast } from "sonner";
 import { noteService } from "@/services";
 import { useAppSelector, RootState, AuthState } from "@/store";
 import { useRouter } from "next/navigation";
-import Loading from "../atoms/loading";
 import { Textarea } from "../ui/textarea";
 
-const noteSchema = z.object({
+import { Plus } from "lucide-react";
+
+const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  content: z.string({ error: "Content is required" }),
+  content: z.string().min(1, "Content is required"),
   reminder: z.string().optional(),
 });
-
-const formSchema = noteSchema;
 
 export default function AddNoteForm() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       title: "",
       content: "",
@@ -52,7 +50,6 @@ export default function AddNoteForm() {
   });
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
     const response = await noteService.createNote(
       {
         title: data.title,
@@ -68,12 +65,11 @@ export default function AddNoteForm() {
     } else {
       toast.error(response.message);
     }
-    setIsLoading(false);
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
 
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
@@ -87,50 +83,58 @@ export default function AddNoteForm() {
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="reminder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reminder</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">ADD NOTE</Button>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="reminder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reminder</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <IconButton
+                Icon={Plus}
+                title="ADD NOTE"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

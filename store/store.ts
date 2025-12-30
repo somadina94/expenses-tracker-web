@@ -10,7 +10,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import { storage } from "@/lib/storage";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const persistConfig = {

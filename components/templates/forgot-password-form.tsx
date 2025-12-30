@@ -55,42 +55,44 @@ export default function ForgotPasswordForm() {
   } = form;
 
   return (
-    <Card className="max-w-120 mx-auto my-24 w-full">
-      <CardHeader>
-        <CardTitle>Forgot your password?</CardTitle>
-        <CardDescription>
-          Enter your registered email address and we will send you 6-digit token
-          to reset your password
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="john@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <IconButton
-                Icon={Mail}
-                title="PROCEED"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
-              />
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+    <div className="max-w-120 mx-auto my-24 p-2">
+      <Card className="max-w-120w-full">
+        <CardHeader>
+          <CardTitle>Forgot your password?</CardTitle>
+          <CardDescription>
+            Enter your registered email address and we will send you 6-digit
+            token to reset your password
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="john@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Mail}
+                  title="PROCEED"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -70,88 +70,90 @@ export default function ResetPasswordForm() {
   } = form;
 
   return (
-    <Card className="max-w-120 mx-auto my-24 w-full">
-      <CardHeader>
-        <CardTitle>Reset password</CardTitle>
-        <CardDescription>
-          Enter the 6-digit OTP sent to your email alongside your new password
-          to reset
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="token"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>6-digit OTP</FormLabel>
-                    <FormControl>
-                      <InputOTP maxLength={6} {...field}>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                        </InputOTPGroup>
-                        <InputOTPSeparator />
-                        <InputOTPGroup>
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="***************"
-                        type="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="passwordConfirm"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="***************"
-                        type="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <IconButton
-                Icon={KeyRound}
-                title="RESET"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
-              />
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+    <div className="max-w-120 mx-auto my-24 p-2">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Reset password</CardTitle>
+          <CardDescription>
+            Enter the 6-digit OTP sent to your email alongside your new password
+            to reset
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="token"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>6-digit OTP</FormLabel>
+                      <FormControl>
+                        <InputOTP maxLength={6} {...field}>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                          </InputOTPGroup>
+                          <InputOTPSeparator />
+                          <InputOTPGroup>
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="***************"
+                          type="password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="passwordConfirm"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="***************"
+                          type="password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={KeyRound}
+                  title="RESET"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

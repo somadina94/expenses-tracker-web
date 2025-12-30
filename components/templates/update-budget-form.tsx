@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Select } from "@radix-ui/react-select";
 import {
   Card,
@@ -36,14 +35,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Edit } from "lucide-react";
+import IconButton from "../atoms/IconButton";
 
-const budgetSchema = z.object({
-  amount: z.string({ error: "Amount is required" }),
+const formSchema = z.object({
+  amount: z.string().min(1, "Amount is required"),
   month: z.string().min(1, "Month is required"),
-  year: z.string().min(1, "Month is required"),
+  year: z.string().min(1, "Year is required"),
 });
-
-const formSchema = budgetSchema;
 
 export default function UpdateBudgetForm() {
   const { access_token } = useAppSelector(
@@ -56,6 +55,7 @@ export default function UpdateBudgetForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       amount: "",
       month: "",
@@ -112,6 +112,10 @@ export default function UpdateBudgetForm() {
     return <Loading />;
   }
 
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
@@ -120,86 +124,97 @@ export default function UpdateBudgetForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="month"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Month</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a month" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Month</SelectLabel>
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
-                            (month) => (
-                              <SelectItem
-                                key={month.toString()}
-                                value={month.toString()}
-                              >
-                                {getMonthName(month)}
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="month"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Month</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Month</SelectLabel>
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                              (month) => (
+                                <SelectItem
+                                  key={month.toString()}
+                                  value={month.toString()}
+                                >
+                                  {getMonthName(month)}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="year"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Year</FormLabel>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Year</SelectLabel>
+                            {[
+                              new Date().getFullYear() + 1,
+                              new Date().getFullYear(),
+                            ].map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
                               </SelectItem>
-                            )
-                          )}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="year"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Year</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a year" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Year</SelectLabel>
-                          {[
-                            new Date().getFullYear() + 1,
-                            new Date().getFullYear(),
-                          ].map((year) => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">UPADTE</Button>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <IconButton
+                Icon={Edit}
+                title="UPADTE"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                isLoading={isSubmitting}
+              />
+            </fieldset>
           </form>
         </Form>
       </CardContent>

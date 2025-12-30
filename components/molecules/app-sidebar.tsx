@@ -90,14 +90,14 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup className="mb-4">
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem className="border-b">
                 <SidebarMenuButton asChild>
                   <Link
                     href={MENU_ITEMS_TOP.url}
-                    className="flex flex-row items-center gap-3"
+                    className="flex flex-row items-center gap-3 text-primary p-2"
                   >
                     <MENU_ITEMS_TOP.icon />
                     <span>{MENU_ITEMS_TOP.title}</span>
@@ -150,7 +150,7 @@ export function AppSidebar() {
                           <SidebarMenuSubItem key={menu.title}>
                             <Link
                               href={menu.url}
-                              className="flex items-center gap-3 w-full"
+                              className="flex items-center gap-3 w-full text-primary p-1"
                             >
                               <menu.icon />
                               <span>{menu.title}</span>
@@ -166,7 +166,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-4">
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem
@@ -176,7 +176,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild>
                   <Link
                     href={MENU_ITEMS_NOTIFICATION.url}
-                    className="flex flex-row items-center justify-between"
+                    className="flex flex-row items-center justify-between text-primary"
                   >
                     <div className="flex flex-row items-center gap-3">
                       <MENU_ITEMS_NOTIFICATION.icon />
@@ -194,7 +194,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-4">
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {MENU_ITEMS_SINGLE.map((item) => (
@@ -205,7 +205,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <Link
                       href={item.url}
-                      className="flex flex-row items-center justify-between"
+                      className="flex flex-row items-center justify-between text-primary"
                     >
                       <div className="flex flex-row items-center gap-3">
                         <item.icon />

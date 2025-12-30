@@ -74,52 +74,52 @@ export default function Summaries() {
   }
 
   return (
-    <div className="w-full max-w-200 mx-auto flex flex-col gap-6 p-4">
-      <SummaryItem
-        title="Current month budget"
-        value={`${user?.currency} ${formatAmount(
-          currentMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
-        )}`}
-        color="#1E3A8A"
-      />
+    <div className="w-full max-w-200 mx-auto p-4">
+      <h2 className="text-2xl mb-4">Activity summaries</h2>
+      <div className="mx-auto flex flex-col gap-6">
+        <SummaryItem
+          title="Current month budget"
+          value={`${user?.currency} ${formatAmount(
+            currentMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
+          )}`}
+        />
 
-      <SummaryItem
-        title="Current month expenses"
-        value={`${user?.currency} ${formatAmount(
-          currentMonthExpenses.reduce((acc, expense) => acc + expense.amount, 0)
-        )}`}
-        color="#2563EB"
-      />
+        <SummaryItem
+          title="Current month expenses"
+          value={`${user?.currency} ${formatAmount(
+            currentMonthExpenses.reduce(
+              (acc, expense) => acc + expense.amount,
+              0
+            )
+          )}`}
+        />
 
-      <SummaryItem
-        title="Last month budget"
-        value={`${user?.currency} ${formatAmount(
-          lastMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
-        )}`}
-        color="#334155"
-      />
+        <SummaryItem
+          title="Last month budget"
+          value={`${user?.currency} ${formatAmount(
+            lastMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
+          )}`}
+        />
 
-      <SummaryItem
-        title="Last month expenses"
-        value={`${user?.currency} ${formatAmount(
-          lastMonthExpenses.reduce((acc, expense) => acc + expense.amount, 0)
-        )}`}
-        color="#d9480f"
-      />
+        <SummaryItem
+          title="Last month expenses"
+          value={`${user?.currency} ${formatAmount(
+            lastMonthExpenses.reduce((acc, expense) => acc + expense.amount, 0)
+          )}`}
+        />
 
-      <SummaryItem
-        title="Total budget"
-        value={`${user?.currency} ${formatAmount(totalBudget)}`}
-        color="#7C3AED"
-      />
+        <SummaryItem
+          title="Total budget"
+          value={`${user?.currency} ${formatAmount(totalBudget)}`}
+        />
 
-      <SummaryItem
-        title="Total expenses"
-        value={`${user?.currency} ${formatAmount(totalExpenses)}`}
-        color="#0F766E"
-      />
+        <SummaryItem
+          title="Total expenses"
+          value={`${user?.currency} ${formatAmount(totalExpenses)}`}
+        />
 
-      <SummaryItem title="All notes" value={`${totalNotes}`} color="#065F46" />
+        <SummaryItem title="All notes" value={`${totalNotes}`} />
+      </div>
     </div>
   );
 }

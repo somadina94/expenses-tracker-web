@@ -3,22 +3,15 @@ import { Card, CardContent } from "../ui/card";
 export default function SummaryItem({
   title,
   value,
-  color,
 }: {
   title: string;
   value: string;
-  color: string;
 }) {
   return (
-    <Card
-      className="rounded-md py-4 shadow-sm w-full"
-      style={{ backgroundColor: color }}
-    >
+    <Card className="rounded-md py-2 shadow-sm w-full">
       <CardContent className="flex flex-col items-center gap-2 ">
-        <p className="text-md font-semibold text-gray-400">
-          {title.toUpperCase()}
-        </p>
-        <p className="text-md text-gray-300">{value}</p>
+        <p className="text-md">{title.toUpperCase()}</p>
+        <p className="text-md">{value}</p>
       </CardContent>
     </Card>
   );

@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
@@ -30,17 +29,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { getMonthName } from "@/utils/helpers";
+import IconButton from "../atoms/IconButton";
+import { Search } from "lucide-react";
 
-const searchBudgetSchema = z.object({
-  month: z.string({
-    error: "Month is required",
-  }),
-  year: z.string({
-    error: "End date is required",
-  }),
+const formSchema = z.object({
+  month: z.string().min(1, "Month is required"),
+  year: z.string().min(1, "Year is required"),
 });
-
-const formSchema = searchBudgetSchema;
 
 export default function SearchBudgetForm() {
   const { access_token } = useAppSelector(
@@ -51,9 +46,10 @@ export default function SearchBudgetForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       month: "",
-      year: "",
+      year: "2026",
     },
   });
 
@@ -77,84 +73,96 @@ export default function SearchBudgetForm() {
     .sort((a, b) => b.month - a.month)
     .sort((a, b) => b.year - a.year);
 
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
+
   return (
     <div className="max-w-200 mx-auto w-full p-2">
       <Card className="w-full mb-12 mx-auto">
         <CardContent>
           <Form {...form}>
-            <form
-              className="flex flex-col md:flex-row justify-between md:items-center gap-4"
-              onSubmit={form.handleSubmit(handleSubmit)}
-            >
-              <FormField
-                control={form.control}
-                name="month"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Month</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Month</SelectLabel>
-                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
-                              (month) => (
-                                <SelectItem
-                                  key={month.toString()}
-                                  value={month.toString()}
-                                >
-                                  {getMonthName(month)}
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <fieldset
+                disabled={isSubmitting}
+                className="flex flex-col md:flex-row justify-between md:items-center gap-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="month"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Month</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a month" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Month</SelectLabel>
+                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                                (month) => (
+                                  <SelectItem
+                                    key={month.toString()}
+                                    value={month.toString()}
+                                  >
+                                    {getMonthName(month)}
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Year</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a year" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Year</SelectLabel>
+                              {[
+                                new Date().getFullYear() + 1,
+                                new Date().getFullYear(),
+                              ].map((year) => (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
                                 </SelectItem>
-                              )
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="year"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Year</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Year</SelectLabel>
-                            {[
-                              new Date().getFullYear() + 1,
-                              new Date().getFullYear(),
-                            ].map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">SEARCH</Button>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Search}
+                  title="SEARCH"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
             </form>
           </Form>
         </CardContent>

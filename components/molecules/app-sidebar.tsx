@@ -183,7 +183,7 @@ export function AppSidebar() {
                       <span>{MENU_ITEMS_NOTIFICATION.title}</span>
                     </div>
                     {unreadNotifications.length > 0 && (
-                      <span className="text-destructive">
+                      <span className="text-white px-3 py-1.5 bg-red-500 rounded-full">
                         {unreadNotifications.length}
                       </span>
                     )}

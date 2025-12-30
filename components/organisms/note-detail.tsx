@@ -54,7 +54,7 @@ export default function NoteDetail() {
   }
 
   return (
-    <div className="max-w-200 w-full mx-auto ">
+    <div className="max-w-200 w-full mx-auto p-2">
       <h2 className="text-2xl mb-4">Note details</h2>
       <div className="flex flex-col gap-4">
         <DetailItem title="Title" content={note?.title} />

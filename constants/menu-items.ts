@@ -6,6 +6,7 @@ import {
   IoList,
   IoAdd,
   IoSearchOutline,
+  IoHomeOutline,
 } from "react-icons/io5";
 import { CiMoneyBill, CiBellOn } from "react-icons/ci";
 
@@ -89,6 +90,11 @@ export const MENU_ITEMS_SINGLE = [
     title: "Settings",
     url: "/dashboard/settings",
     icon: IoSettingsOutline,
+  },
+  {
+    title: "Home",
+    url: "/",
+    icon: IoHomeOutline,
   },
 ];
 

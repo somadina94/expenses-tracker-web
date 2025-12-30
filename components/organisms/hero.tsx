@@ -27,7 +27,7 @@ export default function Hero() {
         </div>
         <div className="flex gap-4 items-center mt-32">
           <Link
-            href="/"
+            href="#"
             className="flex items-center gap-2 border px-5 py-1 rounded-full bg-background border-gray-500"
           >
             <IoLogoApple className="w-8 h-8" />
@@ -37,8 +37,9 @@ export default function Hero() {
             </div>
           </Link>
           <Link
-            href="/"
+            href="https://play.google.com/store/apps/details?id=com.jahbyte.extrack"
             className="flex items-center gap-2 border px-5 py-1 rounded-full bg-background border-gray-500"
+            target="_blank"
           >
             <IoLogoGooglePlaystore className="w-8 h-8" />
             <div className="flex flex-col">

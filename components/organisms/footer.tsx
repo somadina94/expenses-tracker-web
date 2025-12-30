@@ -8,7 +8,7 @@ export default function Footer() {
         <Link href="#features">FEATURES</Link>
         <Link href="#how-it-works">HOW IT WORKS</Link>
         <Link href="/terms-and-conditions">TERMS & CONDITIONS</Link>
-        <Link href="/privacy-polivy">PRIVACY POLCIY</Link>
+        <Link href="/privacy-policy">PRIVACY POLCIY</Link>
       </nav>
       <div className="flex flex-col justify-end">
         <p className="text-neutral-50">MADE BY</p>

@@ -17,15 +17,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -43,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { fetchCountries } from "@/utils/fetch-countries-currencies";
 import { User } from "@/types";
 import { Edit } from "lucide-react";
+import { Combobox } from "../ui/combobox";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -196,30 +188,22 @@ export default function UpdateAccountForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <Select
-                        key={field.value}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a country" />
-                        </SelectTrigger>
 
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Country</SelectLabel>
-                            {[...countries]
-                              .sort((a, b) => a.label.localeCompare(b.label))
-                              .map((el) => (
-                                <SelectItem key={el.label} value={el.label}>
-                                  {el.label}
-                                </SelectItem>
-                              ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                    <FormControl>
+                      <Combobox
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select a country"
+                        searchPlaceholder="Search country..."
+                        options={[...countries]
+                          .sort((a, b) => a.label.localeCompare(b.label))
+                          .map((el) => ({
+                            label: el.label,
+                            value: el.label,
+                          }))}
+                      />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -231,36 +215,26 @@ export default function UpdateAccountForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
+
                     <FormControl>
-                      <Select
-                        key={field.value}
+                      <Combobox
                         value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Currency</SelectLabel>
-                            {Array.from(
-                              new Map(
-                                cleanCurrencies.map((item) => [
-                                  item.label,
-                                  item,
-                                ])
-                              ).values()
-                            )
-                              .sort((a, b) => a.label.localeCompare(b.label))
-                              .map((el) => (
-                                <SelectItem key={el.label} value={el.label}>
-                                  {el.label}
-                                </SelectItem>
-                              ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                        onChange={field.onChange}
+                        placeholder="Select a currency"
+                        searchPlaceholder="Search currency..."
+                        options={Array.from(
+                          new Map(
+                            cleanCurrencies.map((item) => [item.label, item])
+                          ).values()
+                        )
+                          .sort((a, b) => a.label.localeCompare(b.label))
+                          .map((el) => ({
+                            label: el.label,
+                            value: el.label,
+                          }))}
+                      />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}

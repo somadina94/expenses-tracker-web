@@ -130,126 +130,128 @@ export default function UpdateAccountForm() {
   } = form;
 
   return (
-    <Card className="max-w-120 mx-auto my-24 w-full">
-      <CardHeader>
-        <CardTitle>Update</CardTitle>
-        <CardDescription>Update your account information</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="john@example.com"
-                        type="email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
+    <div className="max-w-120 mx-auto my-24 p-2">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Update</CardTitle>
+          <CardDescription>Update your account information</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="john@example.com"
+                          type="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
 
-                    <FormControl>
-                      <Combobox
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select a country"
-                        searchPlaceholder="Search country..."
-                        options={[...countries]
-                          .sort((a, b) => a.label.localeCompare(b.label))
-                          .map((el) => ({
-                            label: el.label,
-                            value: el.label,
-                          }))}
-                      />
-                    </FormControl>
+                      <FormControl>
+                        <Combobox
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a country"
+                          searchPlaceholder="Search country..."
+                          options={[...countries]
+                            .sort((a, b) => a.label.localeCompare(b.label))
+                            .map((el) => ({
+                              label: el.label,
+                              value: el.label,
+                            }))}
+                        />
+                      </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="currency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
 
-                    <FormControl>
-                      <Combobox
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Select a currency"
-                        searchPlaceholder="Search currency..."
-                        options={Array.from(
-                          new Map(
-                            cleanCurrencies.map((item) => [item.label, item])
-                          ).values()
-                        )
-                          .sort((a, b) => a.label.localeCompare(b.label))
-                          .map((el) => ({
-                            label: el.label,
-                            value: el.label,
-                          }))}
-                      />
-                    </FormControl>
+                      <FormControl>
+                        <Combobox
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a currency"
+                          searchPlaceholder="Search currency..."
+                          options={Array.from(
+                            new Map(
+                              cleanCurrencies.map((item) => [item.label, item])
+                            ).values()
+                          )
+                            .sort((a, b) => a.label.localeCompare(b.label))
+                            .map((el) => ({
+                              label: el.label,
+                              value: el.label,
+                            }))}
+                        />
+                      </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <IconButton
-                Icon={Edit}
-                title="UPADTE"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
-              />
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Edit}
+                  title="UPADTE"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

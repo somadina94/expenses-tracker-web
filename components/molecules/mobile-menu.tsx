@@ -7,6 +7,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useState } from "react";
+import { RootState, AuthState, useAppSelector } from "@/store";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { MenuIcon } from "lucide-react";
@@ -16,6 +17,9 @@ import { LightDarkToggle } from "../ui/light-dark-toggle";
 
 export default function MobileMenu({ className }: { className?: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isLoggedIn } = useAppSelector(
+    (state: RootState) => state.auth
+  ) as AuthState;
   return (
     <nav
       className={cn(
@@ -62,12 +66,22 @@ export default function MobileMenu({ className }: { className?: string }) {
           >
             HOW IT WORKS
           </Link>
-          <Link
-            href="/sign-in"
-            className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
-          >
-            SIGN IN
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              href="/sign-in"
+              className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
+            >
+              SIGN IN
+            </Link>
+          )}
+          {isLoggedIn && (
+            <Link
+              href="/dashboard"
+              className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
+            >
+              MY ACCOUNT
+            </Link>
+          )}
         </DrawerContent>
       </Drawer>
     </nav>

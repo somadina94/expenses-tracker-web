@@ -24,6 +24,7 @@ const authSlice = createSlice({
       Cookies.set("access_token", action.payload, {
         secure: true,
         sameSite: "lax",
+        expires: 90,
       });
     },
     setUser: (state, action) => {

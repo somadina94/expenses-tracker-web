@@ -6,6 +6,7 @@ import { noteService } from "@/services";
 import { Note } from "@/types";
 import { toast } from "sonner";
 import Loading from "../atoms/loading";
+import NoResult from "../atoms/no-result";
 
 export default function AllNotes() {
   const { access_token } = useAppSelector(
@@ -40,11 +41,14 @@ export default function AllNotes() {
   return (
     <div className="max-w-200 w-full mx-auto p-2">
       <h2 className="text-2xl mb-4">All Notes</h2>
-      <div className="flex flex-col items-center gap-4">
-        {sortedNotes.map((note: Note) => (
-          <NoteItem key={note._id} note={note} />
-        ))}
-      </div>
+      {sortedNotes.length === 0 && <NoResult />}
+      {sortedNotes.length > 0 && (
+        <div className="flex flex-col items-center gap-4">
+          {sortedNotes.map((note: Note) => (
+            <NoteItem key={note._id} note={note} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

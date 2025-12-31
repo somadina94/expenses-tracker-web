@@ -6,19 +6,18 @@ export default function TermsAndConditionsPage() {
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-extrabold">Introduction</h2>
             <p className="text-sm">
-              Welcome to Expense Tracker. By downloading, installing, and using
-              our application, you agree to be bound by these Terms and
-              Conditions. If you do not agree with these Terms, you should not
-              use the App.
+              Welcome to Planary. By downloading, installing, and using our
+              application, you agree to be bound by these Terms and Conditions.
+              If you do not agree with these Terms, you should not use the App.
             </p>
           </section>
 
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-extrabold">Description of Service</h2>
             <p className="text-sm">
-              Expense Tracker is an expense management application that allows
-              users to track and manage their expenses. It is provided by
-              Jahbyte Technologies.
+              Planary is an expense management application that allows users to
+              track and manage their expenses. It is provided by Jahbyte
+              Technologies.
             </p>
           </section>
 

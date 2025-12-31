@@ -6,11 +6,11 @@ export default function PrivacyPolicyPage() {
           <section className="flex flex-col gap-2">
             <h2 className="text-base font-extrabold">Introduction</h2>
             <p className="text-sm">
-              At Expense Tracker, we are committed to protecting your privacy.
-              This Privacy Policy explains how we collect, use, and share
-              information about you when you use our mobile application. By
-              using the App, you agree to the collection and use of information
-              in accordance with this Privacy Policy.
+              At Planary, we are committed to protecting your privacy. This
+              Privacy Policy explains how we collect, use, and share information
+              about you when you use our mobile application. By using the App,
+              you agree to the collection and use of information in accordance
+              with this Privacy Policy.
             </p>
           </section>
 

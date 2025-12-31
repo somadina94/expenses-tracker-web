@@ -23,7 +23,7 @@ export default function MobileMenu({ className }: { className?: string }) {
   return (
     <nav
       className={cn(
-        "flex justify-between bg-primary rounded-0 px-2 py-4 -mt-18 items-center z-40 sticky top-0 left-0 right-0",
+        "flex justify-between bg-primary rounded-0 px-2 py-4 items-center z-40 sticky top-0 left-0 right-0",
         className
       )}
     >

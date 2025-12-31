@@ -6,6 +6,7 @@ import { expenseService } from "@/services";
 import { Expense } from "@/types";
 import { toast } from "sonner";
 import Loading from "../atoms/loading";
+import NoResult from "../atoms/no-result";
 
 export default function AllExpenses() {
   const { access_token } = useAppSelector(
@@ -38,11 +39,14 @@ export default function AllExpenses() {
   return (
     <div className="max-w-200 w-full mx-auto p-2">
       <h2 className="text-2xl mb-4">All Expenses</h2>
-      <div className="flex flex-col items-center gap-4">
-        {sortedExpenses.map((expense: Expense) => (
-          <ExpenseItem key={expense._id} expense={expense} />
-        ))}
-      </div>
+      {sortedExpenses.length === 0 && <NoResult />}
+      {sortedExpenses.length > 0 && (
+        <div className="flex flex-col items-center gap-4">
+          {sortedExpenses.map((expense: Expense) => (
+            <ExpenseItem key={expense._id} expense={expense} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

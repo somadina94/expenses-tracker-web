@@ -4,8 +4,15 @@ import { formatAmount } from "@/utils/helpers";
 import SummaryItem from "../molecules/summary-item";
 import { useAppSelector, RootState, AuthState } from "@/store";
 import { Budget, Expense, Note } from "@/types";
-import { budgetService, expenseService, noteService } from "@/services";
+import {
+  budgetService,
+  expenseService,
+  noteService,
+  authService,
+} from "@/services";
 import Loading from "../atoms/loading";
+import { subscribeToPush } from "@/utils/subscribe-to-push-notification";
+import { toast } from "sonner";
 
 export default function Summaries() {
   const { user, access_token } = useAppSelector(
@@ -30,6 +37,33 @@ export default function Summaries() {
       });
     }
   }, [access_token]);
+
+  useEffect(() => {
+    const getToken = async () => {
+      const subscribtionToken = await subscribeToPush();
+      if (subscribtionToken) {
+        let existing = false;
+        for (const token of user?.webPushToken || []) {
+          if (token.endpoint === subscribtionToken.endpoint) {
+            existing = true;
+            break;
+          }
+        }
+        if (!existing) {
+          const res = await authService.updateWebPushToken(
+            access_token as string,
+            subscribtionToken
+          );
+          if (res.status === 200) {
+            toast.success(res.data.message);
+          } else {
+            // toast.error(res.message);
+          }
+        }
+      }
+    };
+    getToken();
+  }, [access_token, user]);
 
   let currentMonthExpenses: Expense[] = [];
   let lastMonthExpenses: Expense[] = [];

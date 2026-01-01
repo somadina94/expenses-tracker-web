@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { User } from "@/types";
+import { User, WebPushToken } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -106,6 +106,29 @@ class AuthService {
       const response = await axiosInstance.patch(
         "expoPushToken",
         { expoPushToken },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return {
+        data: response.data,
+        status: response.status,
+        message: response.data.message,
+      };
+    } catch (error) {
+      if (error && error instanceof AxiosError) {
+        console.log(error);
+        return { message: error.response?.data.message };
+      }
+      return { message: "An unexpected error occurred. Please try again." };
+    }
+  }
+
+  async updateWebPushToken(token: string, webPushToken: WebPushToken) {
+    try {
+      const response = await axiosInstance.patch(
+        "webPushToken",
+        { webPushToken },
         {
           headers: { Authorization: `Bearer ${token}` },
         }

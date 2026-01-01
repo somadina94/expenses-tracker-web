@@ -9,6 +9,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/molecules/app-sidebar";
+import PushProvider from "@/context/push-provider";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -29,6 +30,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <PushProvider />
           <ReduxProvider>
             <SidebarProvider>
               <AppSidebar />

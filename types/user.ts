@@ -1,3 +1,5 @@
+import { WebPushToken } from "./web-push-token";
+
 export interface User {
   _id?: string;
   name: string;
@@ -7,4 +9,5 @@ export interface User {
   expoPushToken?: string[];
   country: string;
   currency: string;
+  webPushToken?: WebPushToken[];
 }

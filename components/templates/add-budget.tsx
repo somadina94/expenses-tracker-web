@@ -76,110 +76,112 @@ export default function AddBudgetForm() {
   } = form;
 
   return (
-    <Card className="max-w-120 mx-auto my-24 w-full">
-      <CardHeader>
-        <CardTitle>Add</CardTitle>
-        <CardDescription>Add a budget for the month</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="month"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Month</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Month</SelectLabel>
-                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
-                              (month) => (
-                                <SelectItem
-                                  key={month.toString()}
-                                  value={month.toString()}
-                                >
-                                  {getMonthName(month)}
+    <div className="p-2">
+      <Card className="max-w-120 mx-auto my-24 w-full">
+        <CardHeader>
+          <CardTitle>Add</CardTitle>
+          <CardDescription>Add a budget for the month</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(handleSubmit)}
+            >
+              <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="month"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Month</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a month" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Month</SelectLabel>
+                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                                (month) => (
+                                  <SelectItem
+                                    key={month.toString()}
+                                    value={month.toString()}
+                                  >
+                                    {getMonthName(month)}
+                                  </SelectItem>
+                                )
+                              )}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Year</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a year" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Year</SelectLabel>
+                              {[
+                                new Date().getFullYear() + 1,
+                                new Date().getFullYear(),
+                              ].map((year) => (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
                                 </SelectItem>
-                              )
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="year"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Year</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Year</SelectLabel>
-                            {[
-                              new Date().getFullYear() + 1,
-                              new Date().getFullYear(),
-                            ].map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <IconButton
-                Icon={Plus}
-                title="ADD BUDGET"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
-              />
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Plus}
+                  title="ADD BUDGET"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

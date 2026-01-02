@@ -4,12 +4,11 @@ self.addEventListener("push", (event) => {
   self.registration.showNotification(data.title || "Notification", {
     body: data.body,
     data: data,
-    notificationId: data.notificationId,
   });
 });
 
 self.addEventListener("notificationclick", (event) => {
-  const notificationId = event.notification.notificationId;
+  const notificationId = event.notification.data.notificationId;
 
   event.notification.close();
 

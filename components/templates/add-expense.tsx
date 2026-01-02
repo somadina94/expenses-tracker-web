@@ -74,95 +74,97 @@ export default function AddExpenseForm() {
   } = form;
 
   return (
-    <Card className="max-w-120 mx-auto my-24 w-full">
-      <CardHeader>
-        <CardTitle>Add</CardTitle>
-        <CardDescription>Add your expense</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        value={
-                          field.value
-                            ? field.value.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value
-                              ? new Date(e.target.value)
-                              : undefined
-                          )
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <IconButton
-                Icon={Plus}
-                title="ADD EXPENSE"
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                isLoading={isSubmitting}
-              />
-            </fieldset>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+    <div className="p-2">
+      <Card className="max-w-120 mx-auto my-24 w-full">
+        <CardHeader>
+          <CardTitle>Add</CardTitle>
+          <CardDescription>Add your expense</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(handleSubmit)}
+            >
+              <fieldset disabled={isSubmitting} className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="number" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          value={
+                            field.value
+                              ? field.value.toISOString().split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? new Date(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <IconButton
+                  Icon={Plus}
+                  title="ADD EXPENSE"
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  isLoading={isSubmitting}
+                />
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

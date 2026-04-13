@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -22,12 +22,15 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { noteService } from "@/services";
 import { useAppSelector, RootState, AuthState } from "@/store";
-import { Note } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "../atoms/loading";
 import { Textarea } from "../ui/textarea";
 import IconButton from "../atoms/IconButton";
-import { Edit } from "lucide-react";
+import { AlertCircle, Edit } from "lucide-react";
+import { useNoteQuery } from "@/hooks/queries/use-note";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -39,10 +42,15 @@ export default function UpdateNoteForm() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [note, setNote] = useState<Note>();
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const id = params.id as string;
+
+  const { data: note, isPending, error } = useNoteQuery(
+    id,
+    access_token ?? undefined
+  );
 
   const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,22 +61,6 @@ export default function UpdateNoteForm() {
       reminder: undefined,
     },
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await noteService.getNote(
-        params.id as string,
-        access_token as string
-      );
-      if (res.status === 200) {
-        setNote(res.data.data.note);
-      } else {
-        toast(res.message);
-      }
-      setIsLoading(false);
-    };
-    fetchData();
-  }, [access_token, params]);
 
   useEffect(() => {
     if (note) {
@@ -100,14 +92,30 @@ export default function UpdateNoteForm() {
 
     if (response.status === 200) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.notes });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.note(id) });
       router.back();
     } else {
       toast.error(response.message);
     }
   };
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
+  }
+
+  if (error || !note) {
+    return (
+      <div className="mx-auto max-w-lg p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error?.message ?? "Note not found."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   const {
@@ -117,7 +125,7 @@ export default function UpdateNoteForm() {
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
-        <CardTitle>Update</CardTitle>
+        <CardTitle className="font-display text-2xl">Update note</CardTitle>
         <CardDescription>Update note details</CardDescription>
       </CardHeader>
       <CardContent>

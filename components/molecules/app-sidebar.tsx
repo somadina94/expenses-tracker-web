@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,7 +25,7 @@ import {
   logout,
   useAppDispatch,
 } from "@/store";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { LightDarkToggle } from "../ui/light-dark-toggle";
 import Link from "next/link";
 import {
@@ -35,37 +34,32 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
-import { notificationService } from "@/services";
-import { Notification } from "@/types";
-import { toast } from "sonner";
 import { IoPowerOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import { useNotificationsQuery } from "@/hooks/queries/use-notifications";
+import { Bell } from "lucide-react";
 
 export function AppSidebar() {
   const { user, access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await notificationService.getNotifications(
-        access_token as string
-      );
-      if (res.status === 200) {
-        setNotifications(res.data.data.notifications);
-      } else {
-        toast(res.message);
-      }
-    };
-    fetchData();
-  }, [access_token]);
+  const { data: notifications = [] } = useNotificationsQuery(
+    access_token ?? undefined
+  );
 
   const unreadNotifications = notifications.filter(
     (notification) => !notification.read
   );
+
+  const nameParts = user?.name?.trim().split(/\s+/) ?? [];
+  const initials =
+    nameParts.length >= 2
+      ? `${nameParts[0][0] ?? ""}${nameParts[1][0] ?? ""}`.toUpperCase()
+      : (nameParts[0]?.slice(0, 2).toUpperCase() ?? "?");
+  const firstName = nameParts[0] ?? "there";
 
   return (
     <Sidebar collapsible="icon">
@@ -74,16 +68,14 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <div className="flex flex-row items-center gap-3">
-                <Avatar className="rounded-lg">
-                  <AvatarImage
-                    src="https://github.com/evilrabbit.png"
-                    alt="@evilrabbit"
-                  />
-                  <AvatarFallback>{`${user?.name[0]}${
-                    user?.name.split(" ")[1][0]
-                  }`}</AvatarFallback>
+                <Avatar className="rounded-lg border border-sidebar-border">
+                  <AvatarFallback className="rounded-lg bg-sidebar-accent text-sidebar-accent-foreground text-sm font-semibold">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
-                <span>Hi, {user?.name.split(" ")[0].toLocaleUpperCase()}</span>
+                <span className="truncate font-medium">
+                  Hi, {firstName}
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -179,11 +171,11 @@ export function AppSidebar() {
                     className="flex flex-row items-center justify-between text-primary"
                   >
                     <div className="flex flex-row items-center gap-3">
-                      <MENU_ITEMS_NOTIFICATION.icon />
+                      <Bell className="size-4 shrink-0" />
                       <span>{MENU_ITEMS_NOTIFICATION.title}</span>
                     </div>
                     {unreadNotifications.length > 0 && (
-                      <span className="text-white px-3 py-1.5 bg-red-500 rounded-full">
+                      <span className="rounded-full bg-destructive px-2.5 py-0.5 text-xs font-semibold text-destructive-foreground">
                         {unreadNotifications.length}
                       </span>
                     )}

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import IconButton from "../atoms/IconButton";
 import {
   Card,
@@ -30,11 +30,15 @@ import {
   AuthState,
 } from "@/store";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
-import { fetchCountries } from "@/utils/fetch-countries-currencies";
+import { useCountriesQuery } from "@/hooks/queries/use-countries";
+import Loading from "../atoms/loading";
 import { User } from "@/types";
 import { Edit } from "lucide-react";
 import { Combobox } from "../ui/combobox";
+import { motion } from "framer-motion";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -48,15 +52,28 @@ export default function UpdateAccountForm() {
   const { access_token, user } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [countries, setCountries] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [currencies, setCurrencies] = useState<
-    { label: string; value: string }[]
-  >([]);
-
   const dispatch = useAppDispatch();
+  const { data: countriesData, isPending: countriesLoading } =
+    useCountriesQuery();
+
+  const countries = useMemo(
+    () =>
+      (countriesData ?? []).map((el) => ({
+        label: el.name,
+        value: el.name,
+      })),
+    [countriesData]
+  );
+  const currencies = useMemo(
+    () =>
+      (countriesData ?? []).map((el) => ({
+        label: el.currencyCode,
+        value: el.currencyCode,
+      })),
+    [countriesData]
+  );
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,25 +85,6 @@ export default function UpdateAccountForm() {
       currency: "",
     },
   });
-
-  useEffect(() => {
-    const fetchCountriesData = async () => {
-      const res = await fetchCountries();
-      if (res) {
-        setCountries(
-          res.map((el: { name: string }) => {
-            return { label: el.name, value: el.name };
-          })
-        );
-        setCurrencies(
-          res.map((el: { currencyCode: string }) => {
-            return { label: el.currencyCode, value: el.currencyCode };
-          })
-        );
-      }
-    };
-    fetchCountriesData();
-  }, [setCountries, setCurrencies]);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     const parsedData: User = {
@@ -103,6 +101,7 @@ export default function UpdateAccountForm() {
     if (response.status === 200) {
       toast.success(response.data.message);
       dispatch(setUser(response.data.data.user));
+      await queryClient.invalidateQueries({ queryKey: queryKeys.me });
       router.back();
     } else {
       toast.error(response.message);
@@ -111,9 +110,10 @@ export default function UpdateAccountForm() {
 
   useEffect(() => {
     if (user) {
+      const parts = user.name.trim().split(/\s+/);
       form.reset({
-        firstName: user.name.split(" ")[0],
-        lastName: user.name.split(" ")[1],
+        firstName: parts[0] ?? "",
+        lastName: parts.length > 1 ? parts.slice(1).join(" ") : "",
         email: user.email,
         country: user.country,
         currency: user.currency,
@@ -129,12 +129,24 @@ export default function UpdateAccountForm() {
     formState: { isSubmitting, isValid },
   } = form;
 
+  if (countriesLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="max-w-120 mx-auto my-24 p-2">
-      <Card className="w-full">
+    <motion.div
+      className="mx-auto my-24 w-full max-w-xl px-4 sm:px-6"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.45,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      }}
+    >
+      <Card className="w-full border-border/80 shadow-xl">
         <CardHeader>
-          <CardTitle>Update</CardTitle>
-          <CardDescription>Update your account information</CardDescription>
+          <CardTitle className="font-display text-2xl">Update account</CardTitle>
+          <CardDescription>Keep your profile and currency accurate.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -242,7 +254,7 @@ export default function UpdateAccountForm() {
                 />
                 <IconButton
                   Icon={Edit}
-                  title="UPADTE"
+                  title="Save changes"
                   type="submit"
                   disabled={!isValid || isSubmitting}
                   isLoading={isSubmitting}
@@ -252,6 +264,6 @@ export default function UpdateAccountForm() {
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

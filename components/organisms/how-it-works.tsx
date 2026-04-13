@@ -8,9 +8,22 @@ import summary from "@/assets/how-summary.png";
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="max-w-325 mx-auto mb-12 pb-12 px-4">
-      <h2 className="text-3xl mb-6">HOW IT WORKS</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-center justify-items-stretch">
+    <section
+      id="how-it-works"
+      className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24"
+    >
+      <div className="mb-12 max-w-2xl">
+        <p className="text-primary mb-3 text-xs font-medium uppercase tracking-[0.35em]">
+          Flow
+        </p>
+        <h2 className="font-display text-foreground text-3xl tracking-tight md:text-4xl">
+          How it works
+        </h2>
+        <p className="text-muted-foreground mt-3 text-base leading-relaxed">
+          From first budget to your next reminder—six crisp steps.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
         <HowItWorksItem
           image={budget}
           description="Register your monthly budget and define how much you plan to spend."

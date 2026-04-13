@@ -24,14 +24,15 @@ import { toast } from "sonner";
 import { authService } from "@/services";
 import { useAppDispatch, login, setUser } from "@/store";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { fetchCountries } from "@/utils/fetch-countries-currencies";
+import { useMemo } from "react";
+import { useCountriesQuery } from "@/hooks/queries/use-countries";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import IconButton from "../atoms/IconButton";
 import { Combobox } from "../ui/combobox";
+import Loading from "../atoms/loading";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -49,14 +50,27 @@ const formSchema = z.object({
 });
 
 export default function SignupForm() {
-  const [countries, setCountries] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [currencies, setCurrencies] = useState<
-    { label: string; value: string }[]
-  >([]);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { data: countriesData, isPending: countriesLoading } =
+    useCountriesQuery();
+
+  const countries = useMemo(
+    () =>
+      (countriesData ?? []).map((el) => ({
+        label: el.name,
+        value: el.name,
+      })),
+    [countriesData]
+  );
+  const currencies = useMemo(
+    () =>
+      (countriesData ?? []).map((el) => ({
+        label: el.currencyCode,
+        value: el.currencyCode,
+      })),
+    [countriesData]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,25 +86,6 @@ export default function SignupForm() {
       terms: true,
     },
   });
-
-  useEffect(() => {
-    const fetchCountriesData = async () => {
-      const res = await fetchCountries();
-      if (res) {
-        setCountries(
-          res.map((el: { name: string }) => {
-            return { label: el.name, value: el.name };
-          })
-        );
-        setCurrencies(
-          res.map((el: { currencyCode: string }) => {
-            return { label: el.currencyCode, value: el.currencyCode };
-          })
-        );
-      }
-    };
-    fetchCountriesData();
-  }, [setCountries, setCurrencies]);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     const parsedData = {
@@ -122,13 +117,17 @@ export default function SignupForm() {
     formState: { isSubmitting, isValid },
   } = form;
 
+  if (countriesLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="max-w-120 mx-auto my-24 p-2">
-      <Card className="w-full">
+    <div className="mx-auto my-24 w-full max-w-xl px-4 sm:px-6">
+      <Card className="w-full border-border/80 shadow-xl">
         <CardHeader>
-          <CardTitle>Register</CardTitle>
+          <CardTitle className="font-display text-2xl">Create account</CardTitle>
           <CardDescription>
-            Register, explore and be able to plan better
+            Join Planary and start planning with clarity.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -293,7 +292,7 @@ export default function SignupForm() {
                 />
                 <IconButton
                   Icon={UserPlus}
-                  title="REGISTER"
+                  title="Register"
                   type="submit"
                   disabled={!isValid || isSubmitting}
                   isLoading={isSubmitting}
@@ -305,7 +304,7 @@ export default function SignupForm() {
         <CardFooter>
           <p>
             Already have an account?{" "}
-            <Link href="sign-in" className="text-primary">
+            <Link href="/sign-in" className="text-primary font-medium">
               Sign in
             </Link>
           </p>

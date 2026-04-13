@@ -1,53 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
-import { ThemeProvider } from "@/context/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 import DesktopMenu from "@/components/molecules/desktop-menu";
 import MobileMenu from "@/components/molecules/mobile-menu";
 import Footer from "@/components/organisms/footer";
-import ReduxProvider from "@/context/redux-provider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
-  title: "Planary",
-  description: "Track expenses, add notes and reminders, set budget",
+  title: "Plan smarter. Spend better.",
+  description:
+    "Planary brings budgets, expense logging, notes, and timed reminders into one calm, focused workspace—with push notifications when it matters.",
+  openGraph: {
+    title: "Planary — Personal finance, simplified",
+    description:
+      "Budgets, expenses, notes, and reminders in one refined workspace.",
+  },
 };
 
-export default function RootLayout({
+export default function PublicLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ReduxProvider>
-            <DesktopMenu className="hidden md:block" />
-            <MobileMenu className="md:hidden" />
-            {children}
-            <Footer />
-            <Toaster />
-          </ReduxProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <>
+      <DesktopMenu className="hidden md:block" />
+      <MobileMenu className="md:hidden" />
+      {children}
+      <Footer />
+    </>
   );
 }

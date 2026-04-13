@@ -8,18 +8,44 @@ function urlBase64ToUint8Array(base64: string) {
   return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
 }
 
+function isVapidKeyMismatchError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return (
+    msg.includes("applicationServerKey") ||
+    msg.includes("gcm_sender_id") ||
+    msg.includes("Registration failed")
+  );
+}
+
 export async function subscribeToPush() {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return;
 
   const reg = await navigator.serviceWorker.ready;
+  const applicationServerKey = urlBase64ToUint8Array(
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+  );
 
-  const subscription = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(
-      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
-    ),
-  });
+  async function doSubscribe() {
+    return reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey,
+    });
+  }
+
+  let subscription: PushSubscription;
+  try {
+    subscription = await doSubscribe();
+  } catch (err) {
+    if (!isVapidKeyMismatchError(err)) {
+      throw err;
+    }
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      await existing.unsubscribe();
+    }
+    subscription = await doSubscribe();
+  }
 
   return {
     endpoint: subscription.endpoint,

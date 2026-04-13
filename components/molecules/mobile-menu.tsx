@@ -10,80 +10,80 @@ import { useState } from "react";
 import { RootState, AuthState, useAppSelector } from "@/store";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { MenuIcon } from "lucide-react";
-import Image from "next/image";
-import logo from "@/assets/Logo-web.jpg";
+import { LayoutGrid, MenuIcon, Sparkles } from "lucide-react";
 import { LightDarkToggle } from "../ui/light-dark-toggle";
+import { PlanaryLogo } from "../atoms/planary-logo";
 
 export default function MobileMenu({ className }: { className?: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoggedIn } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
+
+  const close = () => setMobileMenuOpen(false);
+
   return (
     <nav
       className={cn(
-        "flex justify-between bg-primary rounded-0 px-2 py-4 items-center z-40 sticky top-0 left-0 right-0",
+        "border-border/60 bg-background/80 sticky top-0 z-50 flex items-center justify-between border-b px-4 py-3 backdrop-blur-xl",
         className
       )}
     >
-      <div className="flex justify-between items-center">
-        <Link
-          href="/"
-          className="text-[24px] font-bold md:text-2xl p-0 rounded-full"
+      <Link href="/" onClick={close}>
+        <PlanaryLogo />
+      </Link>
+      <div className="flex items-center gap-3">
+        <LightDarkToggle />
+        <Drawer
+          direction="right"
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
         >
-          <div className="w-28 h-14 relative">
-            <Image
-              src={logo}
-              alt="logo"
-              fill
-              className="rounded-full border-4"
-            />
-          </div>
-        </Link>
-        <LightDarkToggle className="ml-12" />
+          <DrawerTrigger
+            className="text-foreground hover:bg-accent/10 rounded-md p-2"
+            aria-label="Open menu"
+          >
+            <MenuIcon className="size-6" />
+          </DrawerTrigger>
+          <DrawerContent className="bg-background flex flex-col gap-0 px-0 py-8">
+            <DrawerTitle className="sr-only">Main menu</DrawerTitle>
+            <Link
+              href="/#features"
+              onClick={close}
+              className="border-border/60 hover:bg-muted/50 flex items-center gap-3 border-b px-6 py-4 text-sm font-medium"
+            >
+              <LayoutGrid className="size-4 opacity-70" />
+              Features
+            </Link>
+            <Link
+              href="/#how-it-works"
+              onClick={close}
+              className="border-border/60 hover:bg-muted/50 flex items-center gap-3 border-b px-6 py-4 text-sm font-medium"
+            >
+              <Sparkles className="size-4 opacity-70" />
+              How it works
+            </Link>
+            {!isLoggedIn && (
+              <Link
+                href="/sign-in"
+                onClick={close}
+                className="border-border/60 hover:bg-muted/50 px-6 py-4 text-sm font-medium"
+              >
+                Sign in
+              </Link>
+            )}
+            {isLoggedIn && (
+              <Link
+                href="/dashboard"
+                onClick={close}
+                className="border-border/60 hover:bg-muted/50 px-6 py-4 text-sm font-medium"
+              >
+                Dashboard
+              </Link>
+            )}
+          </DrawerContent>
+        </Drawer>
       </div>
-      <Drawer
-        direction="right"
-        open={mobileMenuOpen}
-        onOpenChange={(open) => setMobileMenuOpen(open)}
-        onClose={() => setMobileMenuOpen(false)}
-      >
-        <DrawerTitle></DrawerTitle>
-        <DrawerTrigger>
-          <MenuIcon className="text-white" />
-        </DrawerTrigger>
-        <DrawerContent className="flex flex-col items-center py-12 space-y-12 bg-background">
-          <Link
-            href="#features"
-            className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
-          >
-            FEATURES
-          </Link>
-          <Link
-            href="#how-it-works"
-            className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
-          >
-            HOW IT WORKS
-          </Link>
-          {!isLoggedIn && (
-            <Link
-              href="/sign-in"
-              className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
-            >
-              SIGN IN
-            </Link>
-          )}
-          {isLoggedIn && (
-            <Link
-              href="/dashboard"
-              className="font-medium text-[16px] px-12 py-4 border-b border-t w-full"
-            >
-              MY ACCOUNT
-            </Link>
-          )}
-        </DrawerContent>
-      </Drawer>
     </nav>
   );
 }

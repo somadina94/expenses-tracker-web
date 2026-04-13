@@ -24,6 +24,7 @@ import { authService } from "@/services";
 import { useAppSelector, RootState, AuthState } from "@/store";
 import { useRouter } from "next/navigation";
 import { Edit } from "lucide-react";
+import { motion } from "framer-motion";
 
 const formSchema = z.object({
   passwordCurrent: z.string().min(6, "Password must be at least 6 characters"),
@@ -65,11 +66,19 @@ export default function UpdatePasswordForm() {
   } = form;
 
   return (
-    <div className="max-w-120 mx-auto my-24 p-2">
-      <Card className="w-full">
+    <motion.div
+      className="mx-auto my-24 w-full max-w-xl px-4 sm:px-6"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.45,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      }}
+    >
+      <Card className="w-full border-border/80 shadow-xl">
         <CardHeader>
-          <CardTitle>Update</CardTitle>
-          <CardDescription>Update your password</CardDescription>
+          <CardTitle className="font-display text-2xl">Update password</CardTitle>
+          <CardDescription>Use a strong password you do not reuse elsewhere.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -116,7 +125,7 @@ export default function UpdatePasswordForm() {
                 />
                 <IconButton
                   Icon={Edit}
-                  title="UPADTE"
+                  title="Update password"
                   type="submit"
                   disabled={!isValid || isSubmitting}
                   isLoading={isSubmitting}
@@ -126,6 +135,6 @@ export default function UpdatePasswordForm() {
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

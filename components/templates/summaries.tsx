@@ -1,44 +1,37 @@
 "use client";
-import { useEffect, useState } from "react";
-import { formatAmount } from "@/utils/helpers";
-import SummaryItem from "../molecules/summary-item";
+
+import { useEffect } from "react";
 import { useAppSelector, RootState, AuthState } from "@/store";
-import { Budget, Expense, Note } from "@/types";
-import {
-  budgetService,
-  expenseService,
-  noteService,
-  authService,
-} from "@/services";
-import Loading from "../atoms/loading";
+import { authService } from "@/services";
 import { subscribeToPush } from "@/utils/subscribe-to-push-notification";
 import { toast } from "sonner";
+import Loading from "../atoms/loading";
+import DashboardAnalytics from "./dashboard-analytics";
+import { useBudgetsQuery } from "@/hooks/queries/use-budgets";
+import { useExpensesQuery } from "@/hooks/queries/use-expenses";
+import { useNotesQuery } from "@/hooks/queries/use-notes";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Summaries() {
   const { user, access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const budgetQ = useBudgetsQuery(access_token ?? undefined);
+  const expenseQ = useExpensesQuery(access_token ?? undefined);
+  const noteQ = useNotesQuery(access_token ?? undefined);
+
+  const loading =
+    budgetQ.isPending || expenseQ.isPending || noteQ.isPending;
+
+  const err =
+    budgetQ.error?.message ||
+    expenseQ.error?.message ||
+    noteQ.error?.message;
 
   useEffect(() => {
-    if (access_token) {
-      budgetService.getBudgets(access_token).then((res) => {
-        setBudgets(res.data.data.budgets as Budget[]);
-      });
-      expenseService.getExpenses(access_token).then((res) => {
-        setExpenses(res.data.data.expenses as Expense[]);
-      });
-      noteService.getNotes(access_token).then((res) => {
-        setNotes(res.data.data.notes as Note[]);
-        setIsLoading(false);
-      });
-    }
-  }, [access_token]);
-
-  useEffect(() => {
+    if (!access_token) return;
     const getToken = async () => {
       const subscribtionToken = await subscribeToPush();
       if (subscribtionToken) {
@@ -51,13 +44,11 @@ export default function Summaries() {
         }
         if (!existing) {
           const res = await authService.updateWebPushToken(
-            access_token as string,
+            access_token,
             subscribtionToken
           );
           if (res.status === 200) {
             toast.success(res.data.message);
-          } else {
-            // toast.error(res.message);
           }
         }
       }
@@ -65,95 +56,28 @@ export default function Summaries() {
     getToken();
   }, [access_token, user]);
 
-  let currentMonthExpenses: Expense[] = [];
-  let lastMonthExpenses: Expense[] = [];
-  let currentMonthBudgets: Budget[] = [];
-  let lastMonthBudgets: Budget[] = [];
-
-  if (expenses.length > 0) {
-    currentMonthExpenses = expenses.filter(
-      (expense) =>
-        new Date(expense?.date).getMonth() === new Date().getMonth() &&
-        new Date(expense?.date).getFullYear() === new Date().getFullYear()
-    );
-    lastMonthExpenses = expenses.filter(
-      (expense) =>
-        new Date(expense?.date).getMonth() === new Date().getMonth() - 1 &&
-        new Date(expense?.date).getFullYear() === new Date().getFullYear()
-    );
-  }
-
-  if (budgets.length > 0) {
-    currentMonthBudgets = budgets.filter(
-      (budget) =>
-        budget?.month === new Date().getMonth() &&
-        budget?.year === new Date().getFullYear()
-    );
-    lastMonthBudgets = budgets.filter(
-      (budget) =>
-        budget?.month === new Date().getMonth() - 1 &&
-        budget?.year === new Date().getFullYear()
-    );
-  }
-
-  const totalBudget = budgets.reduce((acc, budget) => acc + budget.amount, 0);
-  const totalExpenses = expenses.reduce(
-    (acc, expense) => acc + expense.amount,
-    0
-  );
-  const totalNotes = notes.length;
-
-  if (isLoading) {
+  if (loading) {
     return <Loading />;
   }
 
-  return (
-    <div className="w-full max-w-200 mx-auto p-4">
-      <h2 className="text-2xl mb-4">Activity summaries</h2>
-      <div className="mx-auto flex flex-col gap-6">
-        <SummaryItem
-          title="Current month budget"
-          value={`${user?.currency} ${formatAmount(
-            currentMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
-          )}`}
-        />
-
-        <SummaryItem
-          title="Current month expenses"
-          value={`${user?.currency} ${formatAmount(
-            currentMonthExpenses.reduce(
-              (acc, expense) => acc + expense.amount,
-              0
-            )
-          )}`}
-        />
-
-        <SummaryItem
-          title="Last month budget"
-          value={`${user?.currency} ${formatAmount(
-            lastMonthBudgets.reduce((acc, budget) => acc + budget.amount, 0)
-          )}`}
-        />
-
-        <SummaryItem
-          title="Last month expenses"
-          value={`${user?.currency} ${formatAmount(
-            lastMonthExpenses.reduce((acc, expense) => acc + expense.amount, 0)
-          )}`}
-        />
-
-        <SummaryItem
-          title="Total budget"
-          value={`${user?.currency} ${formatAmount(totalBudget)}`}
-        />
-
-        <SummaryItem
-          title="Total expenses"
-          value={`${user?.currency} ${formatAmount(totalExpenses)}`}
-        />
-
-        <SummaryItem title="All notes" value={`${totalNotes}`} />
+  if (err) {
+    return (
+      <div className="mx-auto max-w-lg p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Could not load dashboard</AlertTitle>
+          <AlertDescription>{err}</AlertDescription>
+        </Alert>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <DashboardAnalytics
+      budgets={budgetQ.data ?? []}
+      expenses={expenseQ.data ?? []}
+      notes={noteQ.data ?? []}
+      currency={user?.currency ?? ""}
+    />
   );
 }

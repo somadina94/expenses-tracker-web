@@ -7,25 +7,38 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="max-w-325 mx-auto mb-12 pb-12 border-b px-4"
+      className="border-border/60 border-b bg-muted/20"
     >
-      <h2 className="text-3xl mb-6">FEATURES</h2>
-      <div className="flex justify-between items-center flex-col lg:flex-row gap-6">
-        <FeatureItem
-          image={budget}
-          title="Budgets"
-          description="Add a budget every month and be able to see at the end of the month how your expenses compares with your budget and make better decisions"
-        />
-        <FeatureItem
-          image={expense}
-          title="Expenses"
-          description="Add expense anytime you spend money, to keep track of your spending and be able to look back later and see where you can make better decisions"
-        />
-        <FeatureItem
-          image={notes}
-          title="Notes & Reminders"
-          description="Add notes and set reminders to the notes that sends you a push notification whenever the chosen time reaches"
-        />
+      <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+        <div className="mb-12 max-w-2xl">
+          <p className="text-primary mb-3 text-xs font-medium uppercase tracking-[0.35em]">
+            Capabilities
+          </p>
+          <h2 className="font-display text-foreground text-3xl tracking-tight md:text-4xl">
+            Everything you need to stay ahead
+          </h2>
+          <p className="text-muted-foreground mt-3 text-base leading-relaxed">
+            Budgets, spending, and memory—woven together so decisions feel
+            obvious, not overwhelming.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <FeatureItem
+            image={budget}
+            title="Budgets"
+            description="Set monthly limits and see how reality compares—so you adjust before the month slips away."
+          />
+          <FeatureItem
+            image={expense}
+            title="Expenses"
+            description="Capture purchases as they happen. Your history becomes a map of where money actually goes."
+          />
+          <FeatureItem
+            image={notes}
+            title="Notes & reminders"
+            description="Pair ideas with deadlines. Push notifications fire when it is time to act."
+          />
+        </div>
       </div>
     </section>
   );

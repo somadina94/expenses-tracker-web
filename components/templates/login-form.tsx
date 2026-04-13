@@ -27,6 +27,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import IconButton from "../atoms/IconButton";
+import { motion } from "framer-motion";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -67,11 +68,16 @@ export default function LoginForm() {
   } = form;
 
   return (
-    <div className="max-w-120 mx-auto my-24 p-2">
-      <Card className="w-full">
+    <motion.div
+      className="mx-auto my-24 w-full max-w-xl px-4 sm:px-6"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <Card className="w-full border-border/80 shadow-xl">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Login and explore</CardDescription>
+          <CardTitle className="font-display text-2xl">Welcome back</CardTitle>
+          <CardDescription>Sign in to open your workspace.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -112,7 +118,7 @@ export default function LoginForm() {
                 </Link>
                 <IconButton
                   Icon={LogIn}
-                  title="LOGIN"
+                  title="Sign in"
                   type="submit"
                   disabled={!isValid || isSubmitting}
                   isLoading={isSubmitting}
@@ -124,12 +130,12 @@ export default function LoginForm() {
         <CardFooter>
           <p>
             Don&apos;t have an account?{" "}
-            <Link href="sign-up" className="text-primary">
+            <Link href="/sign-up" className="text-primary font-medium">
               Sign up
             </Link>
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </motion.div>
   );
 }

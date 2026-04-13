@@ -25,6 +25,8 @@ import { expenseService } from "@/services";
 import { useAppSelector, RootState, AuthState } from "@/store";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -38,6 +40,7 @@ export default function AddExpenseForm() {
     (state: RootState) => state.auth
   ) as AuthState;
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,6 +66,7 @@ export default function AddExpenseForm() {
 
     if (response.status === 201) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.expenses });
       router.push("/dashboard/all-expenses");
     } else {
       toast.error(response.message);
@@ -124,16 +128,30 @@ export default function AddExpenseForm() {
                           type="date"
                           value={
                             field.value
-                              ? field.value.toISOString().split("T")[0]
+                              ? (() => {
+                                  const d = field.value;
+                                  const y = d.getFullYear();
+                                  const m = String(d.getMonth() + 1).padStart(
+                                    2,
+                                    "0"
+                                  );
+                                  const day = String(d.getDate()).padStart(
+                                    2,
+                                    "0"
+                                  );
+                                  return `${y}-${m}-${day}`;
+                                })()
                               : ""
                           }
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? new Date(e.target.value)
-                                : undefined
-                            )
-                          }
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (!v) {
+                              field.onChange(undefined);
+                              return;
+                            }
+                            const [y, mo, d] = v.split("-").map(Number);
+                            field.onChange(new Date(y, mo - 1, d, 12, 0, 0, 0));
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

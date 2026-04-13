@@ -1,5 +1,4 @@
 "use client";
-import { Select } from "@radix-ui/react-select";
 import IconButton from "../atoms/IconButton";
 import {
   Card,
@@ -26,6 +25,7 @@ import { useAppSelector, RootState, AuthState } from "@/store";
 import { useRouter } from "next/navigation";
 import { getMonthName } from "@/utils/helpers";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -34,6 +34,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 const formSchema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -46,6 +48,7 @@ export default function AddBudgetForm() {
     (state: RootState) => state.auth
   ) as AuthState;
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,6 +68,7 @@ export default function AddBudgetForm() {
 
     if (response.status === 201) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.budgets });
       router.push("/dashboard/all-budgets");
     } else {
       toast.error(response.message);

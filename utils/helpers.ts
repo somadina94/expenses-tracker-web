@@ -19,6 +19,35 @@ export function formatAmount(amount: number): string {
   });
 }
 
+/**
+ * Short labels for chart Y-axes (avoids repeating ".00" and keeps ticks readable).
+ * Tooltips should still use {@link formatAmount} with currency.
+ */
+export function formatChartAxisTick(value: number): string {
+  if (!Number.isFinite(value)) return "";
+  const v = value;
+  const abs = Math.abs(v);
+  if (abs === 0) return "0";
+  if (abs >= 1_000_000) {
+    const n = v / 1_000_000;
+    return `${n >= 10 ? n.toFixed(0) : n.toFixed(1)}M`;
+  }
+  if (abs >= 100_000) {
+    return `${Math.round(v / 1_000)}K`;
+  }
+  if (abs >= 1_000) {
+    const n = v / 1_000;
+    return `${n >= 10 ? n.toFixed(0) : n.toFixed(1)}K`;
+  }
+  if (Number.isInteger(v)) {
+    return v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  }
+  return v.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}
+
 export function getMonthName(month: number, locale: string = 'en-US'): string {
   if (month < 0 || month > 11) {
     throw new Error('Month must be between 0 and 11');

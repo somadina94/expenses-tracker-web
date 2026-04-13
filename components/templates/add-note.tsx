@@ -26,6 +26,8 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "../ui/textarea";
 
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -38,6 +40,7 @@ export default function AddNoteForm() {
     (state: RootState) => state.auth
   ) as AuthState;
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.output<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,6 +64,7 @@ export default function AddNoteForm() {
 
     if (response.status === 201) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.notes });
       router.push("/dashboard/all-notes");
     } else {
       toast.error(response.message);

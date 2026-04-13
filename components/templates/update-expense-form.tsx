@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import IconButton from "../atoms/IconButton";
 import {
   Card,
@@ -24,10 +24,13 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { expenseService } from "@/services";
 import { useAppSelector, RootState, AuthState } from "@/store";
-import { Expense } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "../atoms/loading";
-import { Edit } from "lucide-react";
+import { AlertCircle, Edit } from "lucide-react";
+import { useExpenseQuery } from "@/hooks/queries/use-expense";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -40,10 +43,15 @@ export default function UpdateExpenseForm() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [expense, setExpense] = useState<Expense>();
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const id = params.id as string;
+
+  const { data: expense, isPending, error } = useExpenseQuery(
+    id,
+    access_token ?? undefined
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,22 +63,6 @@ export default function UpdateExpenseForm() {
       description: "",
     },
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await expenseService.getExpense(
-        params.id as string,
-        access_token as string
-      );
-      if (res.status === 200) {
-        setExpense(res.data.data.expense);
-      } else {
-        toast(res.message);
-      }
-      setIsLoading(false);
-    };
-    fetchData();
-  }, [access_token, params]);
 
   useEffect(() => {
     if (expense) {
@@ -97,14 +89,30 @@ export default function UpdateExpenseForm() {
 
     if (response.status === 200) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.expenses });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.expense(id) });
       router.back();
     } else {
       toast.error(response.message);
     }
   };
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
+  }
+
+  if (error || !expense) {
+    return (
+      <div className="mx-auto max-w-lg p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error?.message ?? "Expense not found."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   const {
@@ -114,8 +122,8 @@ export default function UpdateExpenseForm() {
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
-        <CardTitle>Update</CardTitle>
-        <CardDescription>Update expense details</CardDescription>
+        <CardTitle className="font-display text-2xl">Update expense</CardTitle>
+        <CardDescription>Edit title, amount, date, or notes.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -158,16 +166,32 @@ export default function UpdateExpenseForm() {
                         type="date"
                         value={
                           field.value
-                            ? field.value.toISOString().split("T")[0]
+                            ? (() => {
+                                const d = field.value;
+                                const y = d.getFullYear();
+                                const m = String(d.getMonth() + 1).padStart(
+                                  2,
+                                  "0"
+                                );
+                                const day = String(d.getDate()).padStart(
+                                  2,
+                                  "0"
+                                );
+                                return `${y}-${m}-${day}`;
+                              })()
                             : ""
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (!v) {
+                            field.onChange(undefined);
+                            return;
+                          }
+                          const [y, mo, d] = v.split("-").map(Number);
                           field.onChange(
-                            e.target.value
-                              ? new Date(e.target.value)
-                              : undefined
-                          )
-                        }
+                            new Date(y, mo - 1, d, 12, 0, 0, 0)
+                          );
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

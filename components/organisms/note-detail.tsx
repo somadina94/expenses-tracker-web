@@ -1,39 +1,32 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import { RootState, AuthState, useAppSelector } from "@/store";
 import { noteService } from "@/services";
-import { Note } from "@/types";
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 import DetailItem from "../atoms/detail-item";
 import { formatRelativeDateTime } from "@/utils/helpers";
 import ActionItem from "../atoms/action-item";
 import Loading from "../atoms/loading";
+import { useNoteQuery } from "@/hooks/queries/use-note";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function NoteDetail() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [note, setNote] = useState<Note>();
   const params = useParams();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const id = params.id as string;
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await noteService.getNote(
-        params.id as string,
-        access_token as string
-      );
-      if (res.status === 200) {
-        setNote(res.data.data.note);
-      } else {
-        toast(res.message);
-      }
-      setIsLoading(false);
-    };
-    fetchData();
-  }, [access_token, params]);
+  const { data: note, isPending, error } = useNoteQuery(
+    id,
+    access_token ?? undefined
+  );
 
   async function onDelete() {
     const res = await noteService.deleteNote(
@@ -42,31 +35,46 @@ export default function NoteDetail() {
     );
 
     if (res.status === 200) {
-      toast(res.data.message);
+      toast.success(res.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.notes });
       router.back();
     } else {
-      toast(res.message);
+      toast(String(res.message));
     }
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
   }
 
+  if (error || !note) {
+    return (
+      <div className="mx-auto max-w-lg p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error?.message ?? "Note not found."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-200 w-full mx-auto p-2">
-      <h2 className="text-2xl mb-4">Note details</h2>
+    <div className="mx-auto w-full max-w-2xl p-2">
+      <h2 className="font-display mb-6 text-2xl tracking-tight">Note details</h2>
       <div className="flex flex-col gap-4">
-        <DetailItem title="Title" content={note?.title} />
+        <DetailItem title="Title" content={note.title} />
+        <DetailItem title="Content" content={note.content} />
         <DetailItem
           title="Reminder"
-          content={formatRelativeDateTime(new Date(note?.reminder as Date))}
+          content={formatRelativeDateTime(note.reminder as Date)}
         />
-        <DetailItem title="Content" content={note?.content} />
         <ActionItem
           title="Are you absolutely sure?"
           message="Are you sure you want to delete this note? there is no recovery."
-          updateLink={`/dashboard/all-notes/${note?._id}/update`}
+          updateLink={`/dashboard/all-notes/${note._id}/update`}
           onDelete={onDelete}
         />
       </div>

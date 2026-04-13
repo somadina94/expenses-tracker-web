@@ -1,6 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Select } from "@radix-ui/react-select";
+import { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -26,8 +25,12 @@ import { useAppSelector, RootState, AuthState } from "@/store";
 import { Budget } from "@/types";
 import { useParams, useRouter } from "next/navigation";
 import Loading from "../atoms/loading";
+import { useBudgetQuery } from "@/hooks/queries/use-budget";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { getMonthName } from "@/utils/helpers";
 import {
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -35,6 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Edit } from "lucide-react";
 import IconButton from "../atoms/IconButton";
 
@@ -48,10 +53,15 @@ export default function UpdateBudgetForm() {
   const { access_token } = useAppSelector(
     (state: RootState) => state.auth
   ) as AuthState;
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [budget, setBudget] = useState<Budget>();
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const id = params.id as string;
+
+  const { data: budget, isPending, error } = useBudgetQuery(
+    id,
+    access_token ?? undefined
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,22 +72,6 @@ export default function UpdateBudgetForm() {
       year: "",
     },
   });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await budgetService.getBudgetById(
-        params.id as string,
-        access_token as string
-      );
-      if (res.status === 200) {
-        setBudget(res.data.data.budget);
-      } else {
-        toast(res.message);
-      }
-      setIsLoading(false);
-    };
-    fetchData();
-  }, [access_token, params]);
 
   useEffect(() => {
     if (budget) {
@@ -102,14 +96,30 @@ export default function UpdateBudgetForm() {
 
     if (response.status === 200) {
       toast.success(response.data.message);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.budgets });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.budget(id) });
       router.back();
     } else {
       toast.error(response.message);
     }
   };
 
-  if (isLoading) {
+  if (isPending) {
     return <Loading />;
+  }
+
+  if (error || !budget) {
+    return (
+      <div className="mx-auto max-w-lg p-4">
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error?.message ?? "Budget not found."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   const {
@@ -119,8 +129,8 @@ export default function UpdateBudgetForm() {
   return (
     <Card className="max-w-120 mx-auto my-24 w-full">
       <CardHeader>
-        <CardTitle>Update</CardTitle>
-        <CardDescription>Update budget details</CardDescription>
+        <CardTitle className="font-display text-2xl">Update budget</CardTitle>
+        <CardDescription>Adjust amount, month, or year.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -131,7 +141,7 @@ export default function UpdateBudgetForm() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -209,7 +219,7 @@ export default function UpdateBudgetForm() {
               />
               <IconButton
                 Icon={Edit}
-                title="UPADTE"
+                title="Update"
                 type="submit"
                 disabled={!isValid || isSubmitting}
                 isLoading={isSubmitting}

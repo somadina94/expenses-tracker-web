@@ -16,22 +16,25 @@ import { AlertCircle } from "lucide-react";
 
 export default function NoteDetail() {
   const { access_token } = useAppSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   ) as AuthState;
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
   const queryClient = useQueryClient();
 
-  const { data: note, isPending, error } = useNoteQuery(
-    id,
-    access_token ?? undefined
-  );
+  const {
+    data: note,
+    isPending,
+    error,
+  } = useNoteQuery(id, access_token ?? undefined);
+
+  console.log(note);
 
   async function onDelete() {
     const res = await noteService.deleteNote(
       note?._id as string,
-      access_token as string
+      access_token as string,
     );
 
     if (res.status === 200) {
@@ -63,13 +66,15 @@ export default function NoteDetail() {
 
   return (
     <div className="mx-auto w-full max-w-2xl p-2">
-      <h2 className="font-display mb-6 text-2xl tracking-tight">Note details</h2>
+      <h2 className="font-display mb-6 text-2xl tracking-tight">
+        Note details
+      </h2>
       <div className="flex flex-col gap-4">
         <DetailItem title="Title" content={note.title} />
         <DetailItem title="Content" content={note.content} />
         <DetailItem
           title="Reminder"
-          content={formatRelativeDateTime(note.reminder as Date)}
+          content={formatRelativeDateTime(new Date(note.reminder))}
         />
         <ActionItem
           title="Are you absolutely sure?"

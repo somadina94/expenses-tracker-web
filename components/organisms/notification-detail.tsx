@@ -15,17 +15,18 @@ import { AlertCircle } from "lucide-react";
 
 export default function NotificationDetail() {
   const { access_token } = useAppSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   ) as AuthState;
   const params = useParams();
   const id = params.id as string;
   const queryClient = useQueryClient();
   const markOnce = useRef<string | null>(null);
 
-  const { data: notification, isPending, error } = useNotificationQuery(
-    id,
-    access_token ?? undefined
-  );
+  const {
+    data: notification,
+    isPending,
+    error,
+  } = useNotificationQuery(id, access_token ?? undefined);
 
   useEffect(() => {
     if (
@@ -40,9 +41,11 @@ export default function NotificationDetail() {
     (async () => {
       await notificationService.markNotificationRead(
         notification._id as string,
-        access_token
+        access_token,
       );
-      await queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications,
+      });
       await queryClient.invalidateQueries({
         queryKey: queryKeys.notification(id),
       });
@@ -77,7 +80,9 @@ export default function NotificationDetail() {
         <DetailItem title="Message" content={notification.body} />
         <DetailItem
           title="Created"
-          content={formatRelativeDateTime(notification.createdAt as Date)}
+          content={formatRelativeDateTime(
+            new Date(notification.createdAt as Date),
+          )}
         />
       </div>
     </div>
